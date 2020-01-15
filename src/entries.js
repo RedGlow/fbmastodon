@@ -102,7 +102,7 @@ const checkRequiredKeys = (entry, i) => {
   const missingKeys = requiredKeys.filter(key => !entry.hasOwnProperty(key));
   if (missingKeys.length > 0) {
     throw new Error(
-      `Entry ${i + 1} (name: ${entry[name]}) is missing keys ${missingKeys.join(
+      `Entry ${i + 1} (name: ${entry.name}) is missing keys ${missingKeys.join(
         ", "
       )}`
     );
