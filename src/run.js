@@ -30,7 +30,12 @@ const addFbPost = (fbPost, { postMedia, postStatus }) =>
           }))
           .then(logMonad(e => `Added Mastodon post ${e.mastodonPostId}`))
       );
-    });
+    })
+    .then(
+      // wait 1s after each add
+      results =>
+        new Promise(resolve => setTimeout(() => resolve(results), 1000))
+    );
 
 /**
  * Performs an import run. Needs data about:
