@@ -67,9 +67,7 @@ exports.run = ({
             data => `${data.length} posts have not been previously added.`
           )
             .reverse()
-            .map(fbPost => () =>
-              addFbPost(fbPost, mastodonAccessToken, mastodonInterface)
-            )
+            .map(fbPost => () => addFbPost(fbPost, mastodonInterface))
         )
       )
     )
