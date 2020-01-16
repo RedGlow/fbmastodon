@@ -88,7 +88,7 @@ exports.getDbInterface = (dbLocation, dbName) => {
     addIds: ids =>
       ids.length === 0
         ? Promise.resolve()
-        : start.then(
+        : startPromise.then(
             () =>
               new Promise((resolve, reject) =>
                 db.run(
