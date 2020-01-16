@@ -28,6 +28,12 @@ In order to run the program you first have to prepare a configuration file (see 
 
 There is only one mandatory option, "--conf", to pass a configuration file containing all the data to perform the import. See below for the data needed and the structure of the configuration file.
 
+To actually run the script:
+
+```sh
+$ node src/index.js --conf $CONF_FILE
+```
+
 # Configuration
 
 A configuration file contains various entries (each one represents the a page you want to mirror) and some settings which are shared by all the entries.
