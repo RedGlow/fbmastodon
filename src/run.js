@@ -19,9 +19,7 @@ const addFbPost = (fbPost, { postMedia, postStatus }) =>
       Promise.all(fbPost.imageUrls.map(imageUrl => getStream(imageUrl)))
     )
     .then(imageStreams => {
-      return Promise.all(
-        imageStreams.map(m => postMedia(configuration.mastodonAccessToken, m))
-      ).then(mediaResps =>
+      return Promise.all(imageStreams.map(m => postMedia(m))).then(mediaResps =>
         postStatus(
           fbPost.message,
           mediaResps.map(mediaResp => [mediaResp.data.id])
@@ -30,11 +28,7 @@ const addFbPost = (fbPost, { postMedia, postStatus }) =>
             facebookPostId: fbPost.id,
             mastodonPostId: data.id
           }))
-          .then(
-            logMonad(
-              ({ mastodonPostId }) => `Added Mastodon post ${mastodonPostId}`
-            )
-          )
+          .then(logMonad(e => `Added Mastodon post ${e.mastodonPostId}`))
       );
     });
 
@@ -73,7 +67,9 @@ exports.run = ({
             data => `${data.length} posts have not been previously added.`
           )
             .reverse()
-            .map(fbPost => () => addFbPost(fbPost, mastodonInterface))
+            .map(fbPost => () =>
+              addFbPost(fbPost, mastodonAccessToken, mastodonInterface)
+            )
         )
       )
     )

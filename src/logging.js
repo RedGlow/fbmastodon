@@ -1,3 +1,8 @@
+/*
+ * @template T
+ * @param {(data: T) => string | string} fn A function which gets the data to examine and produces a debug string, or directly the string
+ * @returns {(data: T) => T} The logging function, an identity function
+ */
 /**
  * Logs a message in a chain stream of monads. Used especially with promises like this:
  * ```
@@ -5,9 +10,7 @@
  *   .then(logMonad(posts => `Returned ${posts.length} posts!`))
  *   .then(posts => "process posts here");
  * ```
- * @template T
- * @param {(data: T) => string | string} fn A function which gets the data to examine and produces a debug string, or directly the string
- * @returns {(data: T) => T} The logging function, an identity function
+ * @type {<T>(fn: (data: T) => string) => (data: T) => T}
  */
 exports.logMonad = fn => data => {
   console.log(typeof fn === "function" ? fn(data) : fn);
