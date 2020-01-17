@@ -10,7 +10,12 @@ exports.getExistingPosts = facebookIds =>
     .map(id => `'${id}'`)
     .join(", ")});`;
 
-exports.getInsertStatement = ids => `INSERT INTO
+exports.getInsertStatement = ({
+  facebookId,
+  pageId,
+  mastodonPostId,
+  mastodonServerUrl
+}) => `INSERT INTO
   posts (facebookPostId, mastodonPostId)
 VALUES
   ${ids
