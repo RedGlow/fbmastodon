@@ -5,6 +5,12 @@
 const sqlite3 = require("sqlite3");
 const path = require("path");
 
+const {
+  createStatement,
+  getExistingPosts,
+  getInsertStatement
+} = require("./dbsql");
+
 /**
  * A map between file names and databases.
  * @type {Object.<string, import("sqlite3").Database>}}
@@ -30,28 +36,8 @@ const getDb = (dbLocation, dbName) => {
  */
 const start = db =>
   new Promise((resolve, reject) => {
-    return db.run(
-      `CREATE TABLE IF NOT EXISTS posts (
-      facebookPostId TEXT PRIMARY KEY,
-      mastodonPostId TEXT
-  )`,
-      err => (err ? reject(err) : resolve())
-    );
+    return db.run(createStatement, err => (err ? reject(err) : resolve()));
   });
-
-/**
- * Get the Facebook IDs already ported on mastodon between a set
- * @callback GetExistingIds
- * @param {string[]} facebookIds  The list of facebook ids to check
- * @returns {Promise<string[]>}  The list of facebook ids already present in the DB
- */
-
-/**
- * Adds the list of given Facebook IDs to the list of the process ids.
- * @callback AddIds
- * @param {string[]} facebookIds  The list of Facebook ids to add.
- * @returns {Promise<void>} A promise which resolves once the ids have been added
- */
 
 /**
  * @typedef {Object} DbInterface
@@ -62,46 +48,42 @@ const start = db =>
 /**
  * @param {string} dbLocation Directory of the database
  * @param {string} dbName Filename of the database
- * @returns {DbInterface} The interface to the DB
  */
 exports.getDbInterface = (dbLocation, dbName) => {
   const db = getDb(dbLocation, dbName);
   const startPromise = start(db);
 
   return {
+    /**
+     * Get the Facebook IDs already ported on mastodon between a set
+     * @param {string[]} facebookIds  The list of facebook ids to check
+     * @returns {Promise<string[]>}  The list of facebook ids already present in the DB
+     */
     getExistingIds: facebookIds =>
       startPromise.then(
         () =>
           new Promise((resolve, reject) =>
-            db.all(
-              `SELECT facebookPostId FROM posts WHERE facebookPostId IN (${facebookIds
-                .map(id => `'${id}'`)
-                .join(", ")})`,
-              (err, rows) =>
-                err
-                  ? reject(err)
-                  : resolve(rows.map(({ facebookPostId }) => facebookPostId))
+            db.all(getExistingPosts(facebookIds), (err, rows) =>
+              err
+                ? reject(err)
+                : resolve(rows.map(({ facebookPostId }) => facebookPostId))
             )
           )
       ),
 
+    /**
+     * Adds the list of given Facebook IDs to the list of the process ids.
+     * @param {string[]} facebookIds  The list of Facebook ids to add.
+     * @returns {Promise<void>} A promise which resolves once the ids have been added
+     */
     addIds: ids =>
       ids.length === 0
         ? Promise.resolve()
         : startPromise.then(
             () =>
               new Promise((resolve, reject) =>
-                db.run(
-                  `INSERT INTO
-  posts (facebookPostId, mastodonPostId)
-VALUES
-  ${ids
-    .map(
-      ({ facebookPostId, mastodonPostId }) =>
-        `('${facebookPostId}', '${mastodonPostId}')`
-    )
-    .join(",\n  ")}`,
-                  err => (err ? reject(err) : resolve())
+                db.run(getInsertStatement(ids), err =>
+                  err ? reject(err) : resolve()
                 )
               )
           )
