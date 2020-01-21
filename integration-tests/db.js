@@ -34,7 +34,7 @@ test(
 test(
   "Database: get some ids if the table is not empty",
   testDbWrapper(
-    join(__dirname, "db.dump-some-fbids.sql"),
+    join(__dirname, "db", "db.dump-some-fbids.sql"),
     dbInterface => dbInterface.getExistingIds(["20", "30", "40"]),
     async (t, _, results) => {
       t.deepEquals(results, ["20"]);

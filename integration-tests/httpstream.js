@@ -9,10 +9,11 @@ const { getStream } = require("../src/httpstream");
 
 /*
 commands used to produce the https files:
-openssl req -new -x509 -days 9999 -config httpstream.ca.cnf -keyout httpstream.ca-key.pem -out httpstream.ca-crt.pem
-openssl genrsa -out httpstream.server-key.pem 4096
-openssl req -new -config httpstream.server.cnf -key httpstream.server-key.pem -out httpstream.server-csr.pem
-openssl x509 -req -extfile httpstream.server.cnf -days 999 -passin "pass:password" -in httpstream.server-csr.pem -CA httpstream.ca-crt.pem -CAkey httpstream.ca-key.pem -CAcreateserial -out httpstream.server-crt.pem
+cd httpstream
+openssl req -new -x509 -days 9999 -config ca.cnf -keyout ca-key.pem -out ca-crt.pem
+openssl genrsa -out server-key.pem 4096
+openssl req -new -config server.cnf -key server-key.pem -out server-csr.pem
+openssl x509 -req -extfile server.cnf -days 999 -passin "pass:password" -in server-csr.pem -CA ca-crt.pem -CAkey ca-key.pem -CAcreateserial -out server-crt.pem
 */
 
 const getHttpServer = (dirname, useHttps) =>
@@ -23,9 +24,13 @@ const getHttpServer = (dirname, useHttps) =>
       .createServer(
         useHttps
           ? {
-              key: readFileSync(join(__dirname, "httpstream.server-key.pem")),
-              cert: readFileSync(join(__dirname, "httpstream.server-crt.pem")),
-              ca: readFileSync(join(__dirname, "httpstream.ca-crt.pem")),
+              key: readFileSync(
+                join(__dirname, "httpstream", "server-key.pem")
+              ),
+              cert: readFileSync(
+                join(__dirname, "httpstream", "server-crt.pem")
+              ),
+              ca: readFileSync(join(__dirname, "httpstream", "ca-crt.pem")),
               requestCert: false,
               rejectUnauthorized: false
             }
@@ -52,14 +57,14 @@ const streamToString = stream => {
 };
 
 const fileTest = (fname, useHttps = false) => async t => {
-  const root = "httpstream.root";
+  const root = "httpstream/root";
   const { url, stop } = await getHttpServer(root, useHttps);
   try {
     const stream = await getStream(
       useHttps
         ? {
             ca: (https.globalAgent.options.ca || []).concat([
-              readFileSync(join(__dirname, "httpstream.server-crt.pem"))
+              readFileSync(join(__dirname, "httpstream", "server-crt.pem"))
             ])
           }
         : {}
