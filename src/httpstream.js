@@ -6,9 +6,9 @@ const http = require("http");
  * @param {string} url  The URL to download
  * @returns {import("fs").ReadStream} A readable stream
  */
-exports.getStream = url =>
+exports.getStream = getOptions => url =>
   new Promise((resolve, reject) =>
-    (url.indexOf("https") === 0 ? https : http).get(url, res =>
+    (url.indexOf("https") === 0 ? https : http).get(url, getOptions, res =>
       res.statusCode === 200 ? resolve(res) : reject("ERROR")
     )
   );

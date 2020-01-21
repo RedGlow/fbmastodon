@@ -17,6 +17,7 @@
     "yargs": "^15.1.0"
   },
   "devDependencies": {
+    "express": "^4.17.1",
     "faucet": "0.0.1",
     "tape": "^4.13.0",
     "tape-catch": "^1.0.6",
