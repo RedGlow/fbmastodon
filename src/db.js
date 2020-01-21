@@ -5,11 +5,27 @@
 const sqlite3 = require("sqlite3");
 const path = require("path");
 
-const {
-  createStatement,
-  getExistingPosts,
-  getInsertStatement
-} = require("./dbsql");
+const createStatement = `CREATE TABLE IF NOT EXISTS posts (
+  facebookPostId TEXT PRIMARY KEY,
+  pageId TEXT,
+  mastodonPostId TEXT,
+  mastodonServerUrl TEXT
+);`;
+
+const getExistingPosts = facebookIds =>
+  `SELECT facebookPostId FROM posts WHERE facebookPostId IN (${facebookIds
+    .map(id => `'${id}'`)
+    .join(", ")});`;
+
+const getInsertStatement = ({
+  facebookPostId,
+  pageId,
+  mastodonPostId,
+  mastodonServerUrl
+}) => `INSERT INTO
+  posts (facebookPostId, pageId, mastodonPostId, mastodonServerUrl)
+VALUES
+  ("${facebookPostId}", "${pageId}", "${mastodonPostId}", "${mastodonServerUrl}");`;
 
 /**
  * Initialize the database object and the database itself (creates the table if necessary).
