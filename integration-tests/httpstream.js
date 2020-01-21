@@ -16,6 +16,18 @@ openssl req -new -config server.cnf -key server-key.pem -out server-csr.pem
 openssl x509 -req -extfile server.cnf -days 999 -passin "pass:password" -in server-csr.pem -CA ca-crt.pem -CAkey ca-key.pem -CAcreateserial -out server-crt.pem
 */
 
+/**
+ * @typedef {Object} ServerData
+ * @property {string} url The url of the server
+ * @property {() => Promise<void>} close The method to call in order to close the server
+ */
+
+/**
+ * Creates a testing server
+ * @param {string} dirname The directory to serve as static content
+ * @param {bool} useHttps Whether to use HTTPS
+ * @returns {ServerData} data to control the server
+ */
 const getHttpServer = (dirname, useHttps) =>
   new Promise(resolve => {
     const app = express();
@@ -42,7 +54,10 @@ const getHttpServer = (dirname, useHttps) =>
           url: `http${useHttps ? "s" : ""}://localhost:${
             server.address().port
           }`,
-          stop: () => server.close()
+          stop: () =>
+            new Promise((resolve, reject) =>
+              server.close(err => (err ? reject(err) : resolve()))
+            )
         })
       );
   });
@@ -75,7 +90,7 @@ const fileTest = (fname, useHttps = false) => async t => {
       readFileSync(join(__dirname, root, fname), { encoding: "utf8" })
     );
   } finally {
-    stop();
+    await stop();
   }
 };
 
