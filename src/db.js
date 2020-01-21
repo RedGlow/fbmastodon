@@ -22,14 +22,36 @@ const start = db =>
   });
 
 /**
+ * Get the Facebook IDs already ported on mastodon between a set
+ * @callback GetExistingIds
+ * @param {string[]} facebookIds  The list of facebook ids to check
+ * @returns {Promise<string[]>}  The list of facebook ids already present in the DB
+ */
+
+/**
+ * Adds a single fb<=>mastodon entry in the db
+ * @callback AddEntry
+ * @param {{facebookPostId: string, pageId: string, mastodonPostId: string, mastodonServerUrl: string}} entry  The entry to add.
+ * @returns {Promise<void>} A promise which resolves once the ids have been added
+ */
+
+/**
+ * Close the underlying database, making this interface invalid.
+ * @callback Close
+ * @returns {Promise<void>} Completed when the DB is closed.
+ */
+
+/**
  * @typedef {Object} DbInterface
  * @property {GetExistingIds} getExistingIds
- * @property {AddIds} addIds
+ * @property {AddEntry} addEntry
+ * @property {Close} close
  */
 
 /**
  * @param {string} dbLocation Directory of the database
  * @param {string} dbName Filename of the database
+ * @returns {DbInterface} The produced DB interface
  */
 exports.getDbInterface = (dbLocation, dbName) => {
   const db = new sqlite3.Database(path.join(dbLocation, dbName));
@@ -43,11 +65,6 @@ exports.getDbInterface = (dbLocation, dbName) => {
     const startPromise = start(db);
 
     return {
-      /**
-       * Get the Facebook IDs already ported on mastodon between a set
-       * @param {string[]} facebookIds  The list of facebook ids to check
-       * @returns {Promise<string[]>}  The list of facebook ids already present in the DB
-       */
       getExistingIds: facebookIds =>
         startPromise.then(
           () =>
@@ -60,27 +77,16 @@ exports.getDbInterface = (dbLocation, dbName) => {
             )
         ),
 
-      /**
-       * Adds the list of given Facebook IDs to the list of the process ids.
-       * @param {string[]} facebookIds  The list of Facebook ids to add.
-       * @returns {Promise<void>} A promise which resolves once the ids have been added
-       */
-      addIds: ids =>
-        ids.length === 0
-          ? Promise.resolve()
-          : startPromise.then(
-              () =>
-                new Promise((resolve, reject) =>
-                  db.run(getInsertStatement(ids), err =>
-                    err ? reject(err) : resolve()
-                  )
-                )
-            ),
+      addEntry: entry =>
+        startPromise.then(
+          () =>
+            new Promise((resolve, reject) =>
+              db.run(getInsertStatement(entry), err =>
+                err ? reject(err) : resolve()
+              )
+            )
+        ),
 
-      /**
-       * Close the underlying database, making this interface invalid.
-       * @returns {Promise<void>} Completed when the DB is closed.
-       */
       close
     };
   } catch (e) {

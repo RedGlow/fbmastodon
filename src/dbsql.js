@@ -11,16 +11,11 @@ exports.getExistingPosts = facebookIds =>
     .join(", ")});`;
 
 exports.getInsertStatement = ({
-  facebookId,
+  facebookPostId,
   pageId,
   mastodonPostId,
   mastodonServerUrl
 }) => `INSERT INTO
-  posts (facebookPostId, mastodonPostId)
+  posts (facebookPostId, pageId, mastodonPostId, mastodonServerUrl)
 VALUES
-  ${ids
-    .map(
-      ({ facebookPostId, mastodonPostId }) =>
-        `('${facebookPostId}', '${mastodonPostId}')`
-    )
-    .join(",\n  ")};`;
+  ("${facebookPostId}", "${pageId}", "${mastodonPostId}", "${mastodonServerUrl}");`;
