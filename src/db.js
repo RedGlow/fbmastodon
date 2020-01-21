@@ -33,10 +33,11 @@ const start = db =>
  */
 exports.getDbInterface = (dbLocation, dbName) => {
   const db = new sqlite3.Database(path.join(dbLocation, dbName));
-  const close = () =>
-    new Promise((resolve, reject) =>
-      db.close(err => (err ? reject(err) : resolve))
+  const close = () => {
+    return new Promise((resolve, reject) =>
+      db.close(err => (err ? reject(err) : resolve()))
     );
+  };
 
   try {
     const startPromise = start(db);
