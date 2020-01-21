@@ -1,4 +1,4 @@
-const { test } = require("./spec-helpers");
+const { test } = require("../spec-helpers/tape");
 
 const { getLoggingSystem } = require("./logging");
 

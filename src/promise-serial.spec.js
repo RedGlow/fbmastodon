@@ -1,4 +1,4 @@
-const { test } = require("./spec-helpers");
+const { test } = require("../spec-helpers/tape");
 const { promiseSerial } = require("./promise-serial");
 
 test("promise-serial: given two promises, promiseSerial returns a promise with the results", async t => {
