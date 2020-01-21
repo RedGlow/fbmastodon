@@ -1,9 +1,10 @@
-const argv = require("yargs")
+const { readFileSync } = require("fs");
+exports.parser = require("yargs")
   .option("conf", {
     describe: "The configuration file",
     type: "string"
   })
-  .demandOption(["conf"], "Please provide a configuration file").argv;
-const fs = require("fs");
+  .demandOption(["conf"], "Please provide a configuration file");
 
-exports.conf = JSON.parse(fs.readFileSync(argv.conf));
+exports.getConf = argv =>
+  JSON.parse(readFileSync(exports.parser.parse(argv).conf));
