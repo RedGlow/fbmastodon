@@ -61,9 +61,6 @@ const fileTest = (fname, useHttps = false) => async t => {
             ca: (https.globalAgent.options.ca || []).concat([
               readFileSync(join(__dirname, "httpstream.server-crt.pem"))
             ])
-            // checkServerIdentity: (host, cert) => {
-            //   console.log("checkServerIdentity:", host, cert);
-            // }
           }
         : {}
     )(`${url}/${fname}`);
@@ -87,4 +84,9 @@ test(
 test(
   "HttpStream: get a short stream from a given URL using HTTPS",
   fileTest("file.txt", true)
+);
+
+test(
+  "HttpStream: get a short stream from a given URL using HTTPS",
+  fileTest("divina-commedia.txt", true)
 );
