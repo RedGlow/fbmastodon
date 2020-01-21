@@ -59,7 +59,7 @@ exports.getMastodonInterface = (mastodonServerUrl, mastodonAccessToken) => {
 
     postStatus: (message, mediaIds) =>
       m.post("statuses", {
-        status: message,
+        status: message || "",
         media_ids: mediaIds
       })
   };
