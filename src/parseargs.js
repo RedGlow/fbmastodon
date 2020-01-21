@@ -1,4 +1,5 @@
 const { readFileSync } = require("fs");
+
 exports.parser = require("yargs")
   .option("conf", {
     describe: "The configuration file",
