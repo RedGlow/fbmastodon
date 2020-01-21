@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tape src/**/*.spec.js | faucet",
+    "test": "tape src/**/*.spec.js integration-tests/*.js | faucet",
+    "unit-tests": "tape src/**/*.spec.js | faucet",
     "integration-tests": "tape integration-tests/*.js | faucet"
   },
   "author": "",
